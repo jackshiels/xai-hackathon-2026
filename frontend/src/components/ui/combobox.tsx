@@ -61,7 +61,7 @@ export function Combobox({ onSelect }: ComboboxProps) {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[300px] p-0">
-        <Command>
+        <Command className="rounded-xl border border-white/15 bg-grok-panel/90 text-white shadow-2xl backdrop-blur-xl">
           <CommandInput
             placeholder="Type to search..."
             value={inputValue}
