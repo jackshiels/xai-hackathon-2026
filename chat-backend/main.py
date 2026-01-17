@@ -49,6 +49,13 @@ async def clone_user(
     from models import VALID_VOICE_IDS
     if voice not in VALID_VOICE_IDS:
         raise HTTPException(400, f"Invalid voice ID. Must be one of: {VALID_VOICE_IDS}")
+
+    # Check if profile already exists
+    existing_profile = await profile_mgr.get_profile_by_username(handle)
+    if existing_profile:
+        return existing_profile
+
+    # Clone new profile
     profile = await crawler.clone_profile(handle, voice, goals)
     return profile
 

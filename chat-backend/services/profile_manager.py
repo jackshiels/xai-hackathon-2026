@@ -17,6 +17,10 @@ class ProfileManager:
         data = await db.profiles.find_one({"_id": pid})
         return UserX(**data) if data else None
 
+    async def get_profile_by_username(self, username: str) -> Optional[UserX]:
+        data = await db.profiles.find_one({"username": username})
+        return UserX(**data) if data else None
+
     async def get_all_tags(self) -> List[str]:
         pipeline = [
             {"$unwind": "$tags"},
