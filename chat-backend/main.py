@@ -13,6 +13,7 @@ logger = logging.getLogger("GrokRelay")
 from services.crawler import CrawlerService
 from services.profile_manager import ProfileManager
 from services.chat_engine import ChatEngine
+from services.llm_service import GrokService
 from models import UserX, ConversationalGoal
 from database import db
 
@@ -20,8 +21,9 @@ app = FastAPI()
 XAI_API_KEY = os.getenv("XAI_API_KEY")
 if not XAI_API_KEY:
     print("⚠️ WARNING: XAI_API_KEY not found. Crawler will fail.")
-
-grok_service = GrokService(api_key=XAI_API_KEY)
+    grok_service = None
+else:
+    grok_service = GrokService(api_key=XAI_API_KEY)
 
 # 2. Pass LLM Service to Crawler
 crawler = CrawlerService(grok_service=grok_service)
