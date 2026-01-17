@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation, useParams, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { DebugPanel } from './DebugPanel';
 import { StatusBar } from './StatusBar';
 import { Transcript } from './Transcript';
@@ -128,6 +128,7 @@ function floatTo16BitPCM(float32Arr: Float32Array) {
 
 export default function Chat() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { username } = useParams<{ username: string }>();
   const [searchParams] = useSearchParams();
   const profileId = useMemo(() => searchParams.get('profileID') ?? username ?? null, [searchParams, username]);
@@ -417,8 +418,15 @@ export default function Chat() {
       </div>
 
       <main className="relative z-20 mx-auto w-full max-w-6xl px-4 pb-14">
+        <button
+          onClick={() => navigate(-1)}
+          className="group absolute left-4 top-6 z-30 flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-gray-200 backdrop-blur transition hover:-translate-y-[1px] hover:border-white/30 hover:bg-white/15"
+        >
+          <span className="inline-block h-2 w-2 -translate-y-[1px] rotate-45 border-b border-l border-current" />
+          Back
+        </button>
         <div className="relative w-full select-none text-center">
-          <h1 className="mb-24 mt-4 font-sans font-extrabold text-[22vw] leading-none tracking-tight grok-text-gradient opacity-90 mix-blend-overlay md:text-[240px]">
+          <h1 className="mb-12 mt-4 font-sans font-extrabold text-[12vw] leading-none tracking-tight grok-text-gradient opacity-90 mix-blend-overlay md:text-[180px]">
             PersonifX
           </h1>
           <h1 className="pointer-events-none absolute inset-0 font-sans font-extrabold text-[22vw] leading-none tracking-tight text-white blur-3xl opacity-10 md:text-[240px]">

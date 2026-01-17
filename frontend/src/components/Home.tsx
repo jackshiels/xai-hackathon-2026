@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Combobox } from './ui/combobox';
 
 const BACKEND_URL = 'http://localhost:8000';
@@ -30,6 +30,20 @@ function Home() {
   const [profiles, setProfiles] = useState<UserX[]>([]);
   const [profilesError, setProfilesError] = useState<string | null>(null);
   const [loadingProfiles, setLoadingProfiles] = useState(false);
+  const particles = useMemo(
+    () =>
+      Array.from({ length: 32 }).map(() => ({
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: 2 + Math.random() * 4,
+        delay: Math.random() * 6,
+        duration: 18 + Math.random() * 12,
+        glow: 6 + Math.random() * 12,
+        driftX: 10 + Math.random() * 24,
+        driftY: 12 + Math.random() * 26,
+      })),
+    [],
+  );
 
   const handleUserSelect = async (username: string) => {
     setError(null);
@@ -87,6 +101,27 @@ function Home() {
         <div className="absolute -left-1/4 -top-1/3 h-[60vw] w-[60vw] bg-glow-conic opacity-40 blur-3xl" />
         <div className="absolute top-1/2 right-[-12%] -translate-y-1/2 h-[80vw] w-[80vw] nebula-glow rounded-full mix-blend-screen" />
         <div className="absolute top-1/2 right-[-200px] -translate-y-1/2 h-[820px] w-[620px] light-beam" />
+        <div className="particle-field absolute inset-0">
+          {particles.map((p, idx) => (
+            <span
+              key={idx}
+              className="particle"
+              style={{
+                left: `${p.x}%`,
+                top: `${p.y}%`,
+                width: `${p.size}px`,
+                height: `${p.size}px`,
+                animationDelay: `${p.delay}s, ${p.delay}s`,
+                animationDuration: `${p.duration}s, ${p.duration * 0.7}s`,
+                // @ts-expect-error CSS custom props
+                '--dx': `${p.driftX}px`,
+                // @ts-expect-error CSS custom props
+                '--dy': `${p.driftY}px`,
+                filter: `drop-shadow(0 0 ${p.glow}px rgba(140, 200, 255, 0.7))`,
+              }}
+            />
+          ))}
+        </div>
       </div>
 
       <main className="relative z-20 mx-auto flex min-h-[70vh] w-full max-w-5xl flex-col items-center justify-center px-4 pb-14 text-center">
@@ -99,7 +134,8 @@ function Home() {
           </h1>
         </div>
         <p className="mt-[-6px] max-w-2xl text-sm text-gray-300 md:text-base">
-          Search for an X username to generate and explore their PersonifX profile.
+          Clone your Profile in Seconds and Create a Second{' '}
+          <span className="you-glow">You</span>
         </p>
 
         <div className="relative mt-8 w-full max-w-xl">

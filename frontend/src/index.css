@@ -41,15 +41,23 @@ body {
 
 .grok-text-gradient {
   background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.05) 0%,
-    rgba(255, 255, 255, 0.4) 40%,
-    rgba(255, 255, 255, 0.8) 70%,
-    #ffffff 100%
+    120deg,
+    rgba(255, 255, 255, 0.7) 0%,
+    rgba(255, 115, 250, 0.9) 15%,
+    rgba(130, 180, 255, 0.95) 35%,
+    rgba(140, 255, 200, 0.9) 50%,
+    rgba(255, 215, 120, 0.95) 65%,
+    rgba(255, 135, 170, 0.9) 80%,
+    rgba(255, 255, 255, 0.8) 100%
   );
+  background-size: 260% 260%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 100px rgba(255, 255, 255, 0.1);
+  animation: grokRainbowShift 18s ease-in-out infinite, grokPulseGlow 7s ease-in-out infinite;
+  text-shadow:
+    0 0 18px rgba(255, 255, 255, 0.18),
+    0 0 32px rgba(140, 200, 255, 0.16),
+    0 0 48px rgba(255, 150, 230, 0.14);
 }
 
 .nebula-glow {
@@ -61,4 +69,122 @@ body {
   background: radial-gradient(ellipse at right, rgba(255, 255, 255, 0.8) 0%, rgba(165, 180, 252, 0.4) 20%, transparent 70%);
   filter: blur(60px);
   opacity: 0.8;
+}
+
+.particle-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.particle-field .particle {
+  position: absolute;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(120, 180, 255, 0.2) 60%, transparent 100%);
+  animation-name: particleFloat, particleGlow;
+  animation-duration: var(--float-duration, 20s), var(--glow-duration, 14s);
+  animation-delay: var(--float-delay, 0s), var(--glow-delay, 0s);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translate3d(calc(var(--dx, 14px) * -0.6), calc(var(--dy, 16px) * 0.6), 0) scale(0.92);
+    opacity: 0.65;
+  }
+  50% {
+    transform: translate3d(calc(var(--dx, 14px) * 0.8), calc(var(--dy, 16px) * -0.8), 0) scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(calc(var(--dx, 14px) * -0.5), calc(var(--dy, 16px) * 0.9), 0) scale(0.9);
+    opacity: 0.6;
+  }
+}
+
+@keyframes particleGlow {
+  0% {
+    box-shadow: 0 0 12px rgba(140, 200, 255, 0.4), 0 0 32px rgba(120, 190, 255, 0.18);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(160, 220, 255, 0.55), 0 0 42px rgba(120, 190, 255, 0.22);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(140, 200, 255, 0.35), 0 0 26px rgba(120, 190, 255, 0.16);
+  }
+}
+
+@keyframes grokRainbowShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes grokPulseGlow {
+  0% {
+    text-shadow:
+      0 0 14px rgba(255, 255, 255, 0.24),
+      0 0 28px rgba(120, 190, 255, 0.2);
+  }
+  50% {
+    text-shadow:
+      0 0 20px rgba(255, 215, 160, 0.4),
+      0 0 42px rgba(255, 115, 250, 0.32);
+  }
+  100% {
+    text-shadow:
+      0 0 12px rgba(255, 255, 255, 0.22),
+      0 0 30px rgba(130, 200, 255, 0.18);
+  }
+}
+
+.you-glow {
+  font-weight: 800;
+  background: linear-gradient(135deg, #ff8bd1 0%, #8ad2ff 30%, #7bffb5 55%, #ffd37a 80%, #ff9ccf 100%);
+  background-size: 220% 220%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: youShift 10s ease-in-out infinite, youPulse 6s ease-in-out infinite;
+  text-shadow:
+    0 0 12px rgba(255, 168, 229, 0.35),
+    0 0 26px rgba(140, 210, 255, 0.28);
+}
+
+@keyframes youShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes youPulse {
+  0% {
+    text-shadow:
+      0 0 12px rgba(255, 220, 240, 0.4),
+      0 0 28px rgba(140, 210, 255, 0.25);
+  }
+  50% {
+    text-shadow:
+      0 0 18px rgba(255, 180, 230, 0.5),
+      0 0 34px rgba(120, 240, 200, 0.32);
+  }
+  100% {
+    text-shadow:
+      0 0 10px rgba(255, 220, 240, 0.35),
+      0 0 26px rgba(140, 210, 255, 0.22);
+  }
 }
