@@ -13,10 +13,20 @@ export default {
         'surface-strong': 'rgb(var(--surface-strong) / <alpha-value>)',
         accent: 'rgb(var(--accent) / <alpha-value>)',
         'accent-strong': 'rgb(var(--accent-strong) / <alpha-value>)',
+        grok: {
+          bg: '#020202',
+          panel: '#0A0A0A',
+          border: '#1F1F1F',
+        },
       },
       fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
         'space-grotesk': ['Space Grotesk', 'system-ui', 'sans-serif'],
         'ibm-plex-mono': ['IBM Plex Mono', 'monospace'],
+      },
+      backgroundImage: {
+        'glow-conic': 'conic-gradient(from 90deg at 50% 50%, #000000 0%, #1A1A1A 50%, #FFFFFF 100%)',
       },
     },
   },

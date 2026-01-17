@@ -304,41 +304,120 @@ export default function Chat() {
   const isConnected = useMemo(() => status !== 'disconnected' && status !== 'connecting', [status]);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10">
-      <div className="rounded-3xl border border-white/60 bg-white/80 p-8 shadow-xl backdrop-blur">
-        <h1 className="mb-6 text-2xl font-semibold text-ink">Grok Voice Agent</h1>
-
-        <div className="space-y-4">
-          <StatusBar status={status} text={statusText} micText={micText} />
-
-          <Transcript messages={messages} />
-
-          {error ? (
-            <div className="rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 shadow-inner">
-              {error}
-            </div>
-          ) : null}
-
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              onClick={connect}
-              disabled={isConnecting}
-              className="rounded-xl bg-ink px-4 py-2 text-sm font-semibold shadow transition hover:-translate-y-[1px] hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {isConnecting ? 'Connecting...' : 'Start Conversation'}
-            </button>
-            <button
-              onClick={disconnect}
-              disabled={!isConnected}
-              className="rounded-xl border border-white/60 bg-surface px-4 py-2 text-sm font-semibold text-ink shadow-sm transition hover:-translate-y-[1px] hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Disconnect
-            </button>
-          </div>
-
-          <DebugPanel show={showDebug} logs={logs} onToggle={setShowDebug} />
-        </div>
+    <div className="relative min-h-screen overflow-hidden bg-grok-bg text-white">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -left-1/4 -top-1/3 h-[60vw] w-[60vw] bg-glow-conic opacity-40 blur-3xl" />
+        <div className="absolute top-1/2 right-[-12%] -translate-y-1/2 h-[80vw] w-[80vw] nebula-glow rounded-full mix-blend-screen" />
+        <div className="absolute top-1/2 right-[-200px] -translate-y-1/2 h-[820px] w-[620px] light-beam" />
       </div>
+
+      <header className="relative z-20 mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5">
+            <svg viewBox="0 0 24 24" fill="white" className="h-5 w-5">
+              <path d="M12 2 2 19h20L12 2Zm0 4 6.5 11h-13L12 6Z" fill="currentColor" />
+            </svg>
+          </div>
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-gray-400">Realtime</p>
+            <p className="text-sm text-gray-200">Voice Agent Console</p>
+          </div>
+        </div>
+        <nav className="hidden items-center space-x-6 text-[11px] font-mono uppercase tracking-[0.18em] text-gray-500 md:flex">
+          <a className="transition hover:text-white" href="#">Grok</a>
+          <a className="transition hover:text-white" href="#">API</a>
+          <a className="transition hover:text-white" href="#">Company</a>
+          <a className="transition hover:text-white" href="#">Colossus</a>
+          <a className="transition hover:text-white" href="#">Careers</a>
+          <a className="transition hover:text-white" href="#">News</a>
+          <a className="transition hover:text-white" href="#">Shop</a>
+        </nav>
+        <div className="flex items-center justify-end">
+          <button className="font-mono text-[10px] uppercase tracking-[0.2em] rounded-full border border-white/20 px-4 py-2 transition-all duration-300 hover:-translate-y-[1px] hover:bg-white hover:text-black">
+            Try Grok
+          </button>
+        </div>
+      </header>
+
+      <main className="relative z-20 mx-auto w-full max-w-5xl px-4 pb-14">
+        <div className="relative w-full select-none text-center">
+          <h1 className="font-sans font-extrabold text-[22vw] leading-none tracking-tight grok-text-gradient opacity-90 mix-blend-overlay md:text-[240px]">
+            Grok
+          </h1>
+          <h1 className="pointer-events-none absolute inset-0 font-sans font-extrabold text-[22vw] leading-none tracking-tight text-white blur-3xl opacity-10 md:text-[240px]">
+            Grok
+          </h1>
+        </div>
+        <p className="mt-[-10px] text-center text-gray-400 md:text-lg">
+          Realtime xAI voice console with live transcripts, session controls, and debug traces.
+        </p>
+
+        <div className="relative mt-8">
+          <div className="relative overflow-hidden rounded-[28px] border border-grok-border/60 bg-grok-panel/80 p-6 shadow-[0_30px_90px_-60px_rgba(0,0,0,0.8)] backdrop-blur-2xl ring-1 ring-white/5">
+            <div className="pointer-events-none absolute inset-0 opacity-60">
+              <div className="absolute -right-16 -top-24 h-64 w-64 rounded-full bg-white/5 blur-3xl" />
+              <div className="absolute left-16 bottom-0 h-52 w-52 rounded-full bg-blue-500/10 blur-3xl" />
+            </div>
+
+            <div className="relative flex flex-col gap-5">
+              <StatusBar status={status} text={statusText} micText={micText} />
+
+              <Transcript messages={messages} />
+
+              {error ? (
+                <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-200 shadow-inner">
+                  {error}
+                </div>
+              ) : null}
+
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  onClick={connect}
+                  disabled={isConnecting}
+                  className="group relative overflow-hidden rounded-full border border-white/30 bg-white px-5 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-black shadow-xl transition-all duration-300 hover:-translate-y-[1px] hover:shadow-white/40 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <span className="relative z-10">{isConnecting ? 'Connecting...' : 'Start Conversation'}</span>
+                  <span className="absolute inset-0 bg-gradient-to-r from-white via-white to-gray-200 opacity-0 transition group-hover:opacity-20" />
+                </button>
+                <button
+                  onClick={disconnect}
+                  disabled={!isConnected}
+                  className="rounded-full border border-white/20 px-5 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-gray-200 transition duration-300 hover:-translate-y-[1px] hover:border-white/40 hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Disconnect
+                </button>
+              </div>
+
+              <DebugPanel show={showDebug} logs={logs} onToggle={setShowDebug} />
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer className="relative z-20 mx-auto w-full max-w-5xl px-6 pb-8 pt-2">
+        <div className="flex flex-col items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 shadow-lg backdrop-blur md:flex-row md:gap-0">
+          <div className="flex flex-1 justify-start">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="white" className="h-6 w-6 opacity-50 animate-bounce">
+              <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 13.5-7.5 7.5m0 0L4.5 13.5M12 21V3" />
+            </svg>
+          </div>
+          <div className="flex flex-1 items-center justify-center text-center">
+            <p className="text-xs font-medium tracking-wide text-gray-300 md:text-sm">
+              xAI Raises $20B Series E: xAI is rapidly accelerating its progress in building advanced AI.
+            </p>
+          </div>
+          <div className="flex flex-1 justify-end">
+            <a
+              href="#"
+              className="group flex items-center space-x-2 rounded-full border border-white/20 px-5 py-2 transition-all hover:bg-white/5"
+            >
+              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-300 group-hover:text-white">
+                Read Announcement
+              </span>
+            </a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

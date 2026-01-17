@@ -1,15 +1,15 @@
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500&display=swap");
 
 @import 'tailwindcss';
 
 :root {
-  color-scheme: light;
-  --ink: 22 27 38;
-  --muted: 84 96 116;
-  --surface: 248 242 234;
-  --surface-strong: 255 255 255;
-  --accent: 237 176 119;
-  --accent-strong: 214 106 71;
+  color-scheme: dark;
+  --ink: 240 243 247;
+  --muted: 156 163 175;
+  --surface: 10 10 10;
+  --surface-strong: 14 14 14;
+  --accent: 255 255 255;
+  --accent-strong: 199 210 254;
 }
 
 * {
@@ -19,15 +19,46 @@
 body {
   margin: 0;
   min-height: 100%;
-  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-family: "Inter", system-ui, sans-serif;
   color: rgb(var(--ink));
   background:
-    radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.85), transparent 45%),
-    radial-gradient(circle at 85% 15%, rgba(237, 176, 119, 0.35), transparent 40%),
-    linear-gradient(135deg, rgba(248, 242, 234, 0.95), rgba(244, 234, 220, 0.95));
+    radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.06), transparent 38%),
+    radial-gradient(circle at 78% 12%, rgba(100, 149, 237, 0.16), transparent 35%),
+    radial-gradient(circle at 62% 82%, rgba(255, 255, 255, 0.05), transparent 40%),
+    #020202;
   background-attachment: fixed;
+  text-rendering: optimizeLegibility;
 }
 
 #root {
   min-height: 100vh;
+}
+
+::selection {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.grok-text-gradient {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.4) 40%,
+    rgba(255, 255, 255, 0.8) 70%,
+    #ffffff 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 100px rgba(255, 255, 255, 0.1);
+}
+
+.nebula-glow {
+  background: radial-gradient(circle at center, rgba(100, 149, 237, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
+  filter: blur(80px);
+}
+
+.light-beam {
+  background: radial-gradient(ellipse at right, rgba(255, 255, 255, 0.8) 0%, rgba(165, 180, 252, 0.4) 20%, transparent 70%);
+  filter: blur(60px);
+  opacity: 0.8;
 }
