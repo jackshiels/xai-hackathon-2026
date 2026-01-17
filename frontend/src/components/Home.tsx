@@ -165,9 +165,7 @@ function Home() {
               <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-gray-400">
                 X Username Required
               </p>
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-2 shadow-inner backdrop-blur">
-                <Combobox onSelect={handleUserSelect} />
-              </div>
+                 <Combobox onSelect={handleUserSelect} />
               {checking ? (
                 <p className="text-xs text-gray-400">Checking profile...</p>
               ) : null}

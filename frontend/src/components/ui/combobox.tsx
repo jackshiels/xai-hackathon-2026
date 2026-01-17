@@ -61,21 +61,21 @@ export function Combobox({ onSelect }: ComboboxProps) {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0">
-        <Command className="rounded-xl border border-white/15 bg-grok-panel/95 text-white shadow-2xl backdrop-blur-xl">
+        <Command className="rounded-2xl border border-white/10 bg-white/5 text-white shadow-inner backdrop-blur">
           <CommandInput
             placeholder="Type to search..."
-            className="border-white/10 text-white placeholder:text-gray-400"
+            className="border-0 text-white placeholder:text-gray-400"
             value={inputValue}
             onValueChange={setInputValue}
           />
           <CommandList className="max-h-[200px]">
-            <CommandEmpty className="text-gray-400 py-4">No users found.</CommandEmpty>
-            <CommandGroup className="p-1">
+            <CommandEmpty className="text-gra40y-0 py-3">No users found.</CommandEmpty>
+            <CommandGroup className="p-2">
               {users.map((user) => (
                 <CommandItem
                   key={user.username}
                   value={user.username}
-                  className="hover:bg-white/10 data-[selected=true]:bg-white/20 px-3 py-2 rounded-lg text-white"
+                  className="hover:bg-white/10 data-[selected=true]:bg-white/20 px-3 py-2 rounded-xl text-white"
                   onSelect={(currentValue) => {
                     setValue(currentValue === value ? "" : currentValue)
                     setInputValue(currentValue === value ? "" : user.username)
@@ -87,7 +87,7 @@ export function Combobox({ onSelect }: ComboboxProps) {
                 >
                   <Check
                     className={cn(
-                      "mr-2 h-4 w-4",
+                      "mr-2 h-4 w-4 text-white",
                       value === user.username ? "opacity-100" : "opacity-0"
                     )}
                   />
