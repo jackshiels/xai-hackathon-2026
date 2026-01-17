@@ -36,7 +36,7 @@ export function Combobox({ onSelect }: ComboboxProps) {
 
   React.useEffect(() => {
     if (inputValue.length > 2) {
-      fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/search?query=${encodeURIComponent(inputValue)}`)
+      fetch(`${'http://localhost:8001'}/search?query=${encodeURIComponent(inputValue)}`)
         .then(res => res.json())
         .then(data => setUsers(data))
         .catch(err => console.error(err))
