@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { DebugPanel } from './DebugPanel';
 import { StatusBar } from './StatusBar';
 import { Transcript } from './Transcript';
@@ -108,6 +108,9 @@ function floatTo16BitPCM(float32Arr: Float32Array) {
 
 export default function Chat() {
   const location = useLocation();
+  const { username } = useParams<{ username: string }>();
+  const [searchParams] = useSearchParams();
+  const profileId = useMemo(() => searchParams.get('profileID') ?? username ?? null, [searchParams, username]);
   const initialVoice =
     (location.state as { voice?: string } | null)?.voice && typeof (location.state as { voice?: string }).voice === 'string'
       ? (location.state as { voice?: string }).voice
@@ -115,6 +118,8 @@ export default function Chat() {
 
   const [backendUrl, setBackendUrl] = useState('http://localhost:8000');
   const [voice, setVoice] = useState(initialVoice);
+  const [systemInstructions, setSystemInstructions] = useState<string | null>(null);
+  const [isBootstrapping, setIsBootstrapping] = useState(false);
   const [status, setStatus] = useState<Status>('disconnected');
   const [statusText, setStatusText] = useState('Disconnected');
   const [micText, setMicText] = useState('(Mic Inactive)');
@@ -214,6 +219,15 @@ export default function Chat() {
   );
 
   const connect = useCallback(async () => {
+    if (!profileId) {
+      setError('Missing profileID. Please return and pick a profile.');
+      return;
+    }
+    if (!systemInstructions) {
+      setError('Session instructions are not ready yet. Please wait a moment.');
+      return;
+    }
+
     if (wsRef.current) wsRef.current.close();
     setError(null);
     updateStatus('connecting', 'Authenticating...');
@@ -246,7 +260,7 @@ export default function Chat() {
             type: 'session.update',
             session: {
               modalities: ['text', 'audio'],
-              instructions: 'You are a helpful AI.',
+              instructions: systemInstructions,
               voice,
               input_audio_format: 'pcm16',
               output_audio_format: 'pcm16',
@@ -275,7 +289,7 @@ export default function Chat() {
       setError(message);
       updateStatus('disconnected', 'Disconnected');
     }
-  }, [appendMessage, backendUrl, handleMessage, initVAD, logDebug, updateStatus, voice]);
+  }, [appendMessage, backendUrl, handleMessage, initVAD, logDebug, profileId, systemInstructions, updateStatus, voice]);
 
   const disconnect = useCallback(() => {
     wsRef.current?.close();
@@ -311,6 +325,63 @@ export default function Chat() {
       disconnect();
     };
   }, [disconnect, location.state]);
+
+  useEffect(() => {
+    const bootstrapSession = async () => {
+      if (!profileId) {
+        setError('Missing profileID in the URL.');
+        return;
+      }
+
+      setIsBootstrapping(true);
+      updateStatus('connecting', 'Loading profile...');
+
+      try {
+        const profileRes = await fetch(`${backendUrl}/api/profile?profileID=${encodeURIComponent(profileId)}`);
+        if (!profileRes.ok) {
+          throw new Error('Failed to fetch profile');
+        }
+        const profileData = await profileRes.json();
+        if (profileData?.voice_id) setVoice(profileData.voice_id);
+
+        const goals =
+          Array.isArray(profileData?.conversational_goals) && profileData.conversational_goals.length
+            ? profileData.conversational_goals
+                .map((g: any) => {
+                  if (!g) return null;
+                  if (typeof g === 'string') return g;
+                  if (typeof g === 'object' && 'description' in g) return g.description;
+                  return null;
+                })
+                .filter(Boolean)
+            : [];
+
+        const sessionRes = await fetch(`${backendUrl}/api/session/init`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ profile_id: profileId, goals }),
+        });
+
+        if (!sessionRes.ok) {
+          throw new Error('Failed to initialize session');
+        }
+
+        const sessionData = await sessionRes.json();
+        if (sessionData?.system_instructions) setSystemInstructions(sessionData.system_instructions);
+        if (sessionData?.voice_preset) setVoice(sessionData.voice_preset);
+
+        updateStatus('disconnected', 'Ready to connect');
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to prepare chat session';
+        setError(message);
+        updateStatus('disconnected', 'Disconnected');
+      } finally {
+        setIsBootstrapping(false);
+      }
+    };
+
+    bootstrapSession();
+  }, [backendUrl, profileId, updateStatus]);
 
   const isConnecting = useMemo(() => status === 'connecting', [status]);
   const isConnected = useMemo(() => status !== 'disconnected' && status !== 'connecting', [status]);
@@ -354,10 +425,12 @@ export default function Chat() {
               <div className="flex flex-wrap items-center gap-3">
                 <button
                   onClick={connect}
-                  disabled={isConnecting}
+                  disabled={isConnecting || isBootstrapping || !systemInstructions}
                   className="group relative overflow-hidden rounded-full border border-white/30 bg-white px-5 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-black shadow-xl transition-all duration-300 hover:-translate-y-[1px] hover:shadow-white/40 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <span className="relative z-10">{isConnecting ? 'Connecting...' : 'Start Conversation'}</span>
+                  <span className="relative z-10">
+                    {isConnecting ? 'Connecting...' : isBootstrapping ? 'Preparing...' : 'Start Conversation'}
+                  </span>
                   <span className="absolute inset-0 bg-gradient-to-r from-white via-white to-gray-200 opacity-0 transition group-hover:opacity-20" />
                 </button>
                 <button

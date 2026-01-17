@@ -16,6 +16,7 @@ function Home() {
       const res = await fetch(`${BACKEND_URL}/api/profile/exists?handle=${encodeURIComponent(username)}`);
       if (!res.ok) throw new Error('Failed to verify profile');
       const data = await res.json();
+      console.log(data);
       if (data?.exists && data?.profile_id) {
         navigate(`/chat/${data.profile_id}`);
       } else if (data?.exists) {

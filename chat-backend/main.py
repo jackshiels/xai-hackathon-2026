@@ -78,7 +78,23 @@ async def list_tags():
 async def profile_exists(handle: str = Query(...)):
     """Check if a profile exists for the given X handle."""
     existing = await profile_mgr.get_profile_by_username(handle)
-    return {"exists": existing is not None}
+    if not existing:
+        return {"exists": False}
+
+    profile_payload = existing.model_dump(by_alias=True)
+    return {
+        "exists": True,
+        "profile": profile_payload,
+        "profile_id": profile_payload.get("_id"),
+    }
+
+@app.get("/api/profile", response_model=UserX)
+async def get_profile_by_id(profile_id: str = Query(..., alias="profileID")):
+    """Fetch a profile by database ID (query param profileID)."""
+    profile = await profile_mgr.get_profile_by_id(profile_id)
+    if not profile:
+        raise HTTPException(404, "Profile not found")
+    return profile
 
 @app.get("/api/profile/{username}/complete")
 async def get_complete_profile(username: str):
@@ -154,6 +170,7 @@ async def websocket_endpoint(client_ws: WebSocket):
     init_data = await client_ws.receive_json()
     system_instructions = init_data.get("instructions", "You are a helpful AI.")
     voice = init_data.get("voice", "Ara")
+    logger.info(f"💬 WS init instructions (truncated): {str(system_instructions)[:240]}")
     
     async with websockets.connect(
         uri=XAI_URL,
