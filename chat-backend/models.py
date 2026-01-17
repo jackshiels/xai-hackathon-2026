@@ -61,6 +61,9 @@ class UserX(BaseModel):
     # Voice preference
     voice_id: Optional[str] = Field(default="Ara", description="Preferred voice ID for this user")
 
+    # Conversational goals
+    conversational_goals: List["ConversationalGoal"] = Field(default_factory=list, description="Initial conversational goals for this persona")
+
     # Tags
     tags: List[str] = Field(default_factory=list, description="User tags for categorization and filtering")
 

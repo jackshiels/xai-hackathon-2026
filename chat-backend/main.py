@@ -38,9 +38,16 @@ app.add_middleware(
 # --- REST ENDPOINTS ---
 
 @app.post("/api/clone", response_model=UserX)
-async def clone_user(handle: str = Body(..., embed=True)):
+async def clone_user(
+    handle: str = Body(..., embed=True),
+    voice: str = Body("Ara", embed=True),
+    goals: List[str] = Body(default=[], embed=True)
+):
     """Trigger the crawler to clone a Twitter user."""
-    profile = await crawler.clone_profile(handle)
+    from models import VALID_VOICE_IDS
+    if voice not in VALID_VOICE_IDS:
+        raise HTTPException(400, f"Invalid voice ID. Must be one of: {VALID_VOICE_IDS}")
+    profile = await crawler.clone_profile(handle, voice, goals)
     return profile
 
 @app.get("/api/profiles", response_model=List[UserX])
