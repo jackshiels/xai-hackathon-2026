@@ -5,7 +5,7 @@ function Home() {
   const navigate = useNavigate();
 
   const handleUserSelect = (username: string) => {
-    navigate(`/chat/${username}`);
+    navigate(`/clone/${username}`);
   };
 
   return (

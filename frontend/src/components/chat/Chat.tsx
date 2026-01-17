@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { DebugPanel } from './DebugPanel';
 import { StatusBar } from './StatusBar';
 import { Transcript } from './Transcript';
@@ -106,8 +107,14 @@ function floatTo16BitPCM(float32Arr: Float32Array) {
 }
 
 export default function Chat() {
+  const location = useLocation();
+  const initialVoice =
+    (location.state as { voice?: string } | null)?.voice && typeof (location.state as { voice?: string }).voice === 'string'
+      ? (location.state as { voice?: string }).voice
+      : 'Ara';
+
   const [backendUrl, setBackendUrl] = useState('http://localhost:8000');
-  const [voice, setVoice] = useState('Ara');
+  const [voice, setVoice] = useState(initialVoice);
   const [status, setStatus] = useState<Status>('disconnected');
   const [statusText, setStatusText] = useState('Disconnected');
   const [micText, setMicText] = useState('(Mic Inactive)');
@@ -285,6 +292,11 @@ export default function Chat() {
   }, [updateStatus]);
 
   useEffect(() => {
+    const stateVoice = (location.state as { voice?: string } | null)?.voice;
+    if (stateVoice && typeof stateVoice === 'string') {
+      setVoice(stateVoice);
+    }
+
     const load = async () => {
       try {
         await ensureScript(ORT_SRC);
@@ -298,7 +310,7 @@ export default function Chat() {
       isMountedRef.current = false;
       disconnect();
     };
-  }, [disconnect]);
+  }, [disconnect, location.state]);
 
   const isConnecting = useMemo(() => status === 'connecting', [status]);
   const isConnected = useMemo(() => status !== 'disconnected' && status !== 'connecting', [status]);
