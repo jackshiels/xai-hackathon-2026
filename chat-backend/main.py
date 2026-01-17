@@ -77,6 +77,14 @@ async def profile_exists(handle: str):
     existing = await profile_mgr.get_profile_by_username(handle)
     return {"exists": existing is not None}
 
+@app.get("/api/profile/{username}/complete")
+async def get_complete_profile(username: str):
+    """Get complete profile with key prompt attributes."""
+    result = await profile_mgr.get_complete_profile(username)
+    if not result:
+        raise HTTPException(404, f"Profile for @{username} not found")
+    return result
+
 @app.post("/api/session/init")
 async def init_session(profile_id: str = Body(...), goals: List[str] = Body(default=[])):
     """Initialize session. Returns the system prompts & voice config."""
