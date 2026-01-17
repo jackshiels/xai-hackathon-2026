@@ -5,6 +5,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import ConnectionFailure
+from schema import (
+    VoicesResponse, Voice,
+    initialize_voice_presets, get_active_voices, get_voice_by_id,
+    get_user_voice_preference, set_user_voice_preference,
+    create_conversation_session, add_message_to_session,
+    end_conversation_session, get_user_conversation_history
+)
 
 load_dotenv()
 
@@ -28,6 +35,11 @@ async def startup_db_client():
         await mongodb_client.admin.command('ping')
         mongodb_db = mongodb_client[MONGODB_DB_NAME]
         print(f"✅ Connected to MongoDB: {MONGODB_DB_NAME}")
+
+        # Initialize voice presets in database
+        if mongodb_db:
+            await initialize_voice_presets(mongodb_db)
+
     except ConnectionFailure as e:
         print(f"⚠️  MongoDB connection failed: {e}")
         mongodb_client = None
@@ -62,7 +74,7 @@ async def health_check():
         "status": "healthy",
         "mongodb": "disconnected"
     }
-    
+
     if mongodb_client:
         try:
             await mongodb_client.admin.command('ping')
@@ -72,8 +84,141 @@ async def health_check():
             health_status["status"] = "degraded"
     else:
         health_status["status"] = "degraded"
-    
+
     return health_status
+
+
+@app.get("/voices", response_model=VoicesResponse)
+async def get_available_voices():
+    """Get all available voices."""
+    if not mongodb_db:
+        raise HTTPException(status_code=503, detail="Database not available")
+
+    try:
+        voices = await get_active_voices(mongodb_db)
+        voice_models = [Voice(**voice.model_dump()) for voice in voices]
+        return VoicesResponse(voices=voice_models, total_count=len(voice_models))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch voices: {str(e)}")
+
+
+@app.get("/voices/{voice_id}")
+async def get_voice(voice_id: str):
+    """Get a specific voice by ID."""
+    if not mongodb_db:
+        raise HTTPException(status_code=503, detail="Database not available")
+
+    try:
+        voice = await get_voice_by_id(mongodb_db, voice_id)
+        if not voice:
+            raise HTTPException(status_code=404, detail=f"Voice '{voice_id}' not found")
+        return Voice(**voice.model_dump())
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch voice: {str(e)}")
+
+
+@app.get("/users/{user_id}/voice-preference")
+async def get_voice_preference(user_id: str):
+    """Get user's voice preference."""
+    if not mongodb_db:
+        raise HTTPException(status_code=503, detail="Database not available")
+
+    try:
+        preference = await get_user_voice_preference(mongodb_db, user_id)
+        if not preference:
+            # Return default voice if no preference set
+            default_voice = await get_voice_by_id(mongodb_db, "Ara")
+            return {
+                "user_id": user_id,
+                "preferred_voice_id": "Ara",
+                "voice": Voice(**default_voice.model_dump()) if default_voice else None
+            }
+        return preference
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get voice preference: {str(e)}")
+
+
+@app.post("/users/{user_id}/voice-preference")
+async def set_voice_preference(user_id: str, voice_id: str, custom_instructions: str = None):
+    """Set user's voice preference."""
+    if not mongodb_db:
+        raise HTTPException(status_code=503, detail="Database not available")
+
+    # Validate voice exists
+    voice = await get_voice_by_id(mongodb_db, voice_id)
+    if not voice:
+        raise HTTPException(status_code=400, detail=f"Voice '{voice_id}' is not available")
+
+    try:
+        await set_user_voice_preference(mongodb_db, user_id, voice_id, custom_instructions)
+        return {"message": f"Voice preference set to '{voice_id}' for user {user_id}"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to set voice preference: {str(e)}")
+
+
+@app.post("/conversations")
+async def start_conversation(user_id: str, voice_id: str = "Ara"):
+    """Start a new conversation session."""
+    if not mongodb_db:
+        raise HTTPException(status_code=503, detail="Database not available")
+
+    # Validate voice exists
+    voice = await get_voice_by_id(mongodb_db, voice_id)
+    if not voice:
+        raise HTTPException(status_code=400, detail=f"Voice '{voice_id}' is not available")
+
+    try:
+        import uuid
+        session_id = f"session_{uuid.uuid4().hex[:8]}"
+        session = await create_conversation_session(mongodb_db, user_id, session_id, voice_id)
+        return {
+            "session_id": session.session_id,
+            "voice_id": session.voice_id,
+            "started_at": session.started_at.isoformat()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to start conversation: {str(e)}")
+
+
+@app.post("/conversations/{session_id}/messages")
+async def add_conversation_message(session_id: str, role: str, content: str, voice_used: str = None):
+    """Add a message to a conversation session."""
+    if not mongodb_db:
+        raise HTTPException(status_code=503, detail="Database not available")
+
+    try:
+        await add_message_to_session(mongodb_db, session_id, role, content, voice_used)
+        return {"message": "Message added to conversation"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to add message: {str(e)}")
+
+
+@app.post("/conversations/{session_id}/end")
+async def end_conversation(session_id: str):
+    """End a conversation session."""
+    if not mongodb_db:
+        raise HTTPException(status_code=503, detail="Database not available")
+
+    try:
+        await end_conversation_session(mongodb_db, session_id)
+        return {"message": f"Conversation {session_id} ended"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to end conversation: {str(e)}")
+
+
+@app.get("/users/{user_id}/conversations")
+async def get_conversation_history(user_id: str, limit: int = 10):
+    """Get user's recent conversation history."""
+    if not mongodb_db:
+        raise HTTPException(status_code=503, detail="Database not available")
+
+    try:
+        sessions = await get_user_conversation_history(mongodb_db, user_id, limit)
+        return {"conversations": [session.model_dump() for session in sessions]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get conversation history: {str(e)}")
 
 @app.post("/session")
 async def get_ephemeral_token():
