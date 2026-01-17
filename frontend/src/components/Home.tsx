@@ -133,10 +133,28 @@ function Home() {
             PersonifX
           </h1>
         </div>
+        
         <p className="mt-[-6px] max-w-2xl text-sm text-gray-300 md:text-base">
           Clone your Profile in Seconds and Create a Second{' '}
           <span className="you-glow">You</span>
         </p>
+        
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-2 max-w-3xl">
+          {['workout', 'growth', 'tech', 'x-enthusiast', 'finance', 'ai', 'startup', 'crypto'].map((tag, idx) => (
+            <button
+              key={tag}
+              onClick={() => navigate(`/users/${tag}`)}
+              className="group relative overflow-hidden rounded-full border border-white/20 bg-white/5 px-4 py-2 text-xs font-medium text-gray-200 transition hover:border-white/40 hover:bg-white/10 hover:text-white hover:-translate-y-0.5"
+              style={{
+                animation: `float ${3 + idx * 0.3}s ease-in-out infinite`,
+                animationDelay: `${idx * 0.2}s`
+              }}
+            >
+              <span className="relative z-10">#{tag}</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/10 to-blue-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </button>
+          ))}
+        </div>
 
         <div className="relative mt-8 w-full max-w-xl">
           <div className="relative overflow-hidden rounded-[20px] border border-grok-border/60 bg-grok-panel/80 p-5 shadow-[0_30px_90px_-60px_rgba(0,0,0,0.8)] backdrop-blur-2xl ring-1 ring-white/5">
@@ -160,6 +178,8 @@ function Home() {
             </div>
           </div>
         </div>
+
+        <div className="relative mt-8 w-full max-w-xl"></div>
 
         <div className="relative mt-12 w-full max-w-5xl">
           <div className="rounded-[20px] border border-grok-border/60 bg-grok-panel/80 p-5 shadow-[0_30px_90px_-60px_rgba(0,0,0,0.8)] backdrop-blur-2xl">
