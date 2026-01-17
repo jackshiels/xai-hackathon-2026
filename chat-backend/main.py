@@ -71,6 +71,12 @@ async def list_tags():
     """Get all unique tags from the database."""
     return await profile_mgr.get_all_tags()
 
+@app.get("/api/profile/exists")
+async def profile_exists(handle: str):
+    """Check if a profile exists for the given X handle."""
+    existing = await profile_mgr.get_profile_by_username(handle)
+    return {"exists": existing is not None}
+
 @app.post("/api/session/init")
 async def init_session(profile_id: str = Body(...), goals: List[str] = Body(default=[])):
     """Initialize session. Returns the system prompts & voice config."""
