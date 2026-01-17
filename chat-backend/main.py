@@ -186,7 +186,12 @@ async def websocket_endpoint(client_ws: WebSocket):
                 "voice": voice,
                 "input_audio_format": "pcm16",
                 "output_audio_format": "pcm16",
-                "turn_detection": {"type": "server_vad"}
+                "turn_detection": {"type": "server_vad"},
+                "tools": [
+                {
+                "type": "x_search",
+                "allowed_x_handles": [init_data.get("x_handle", "")],
+                }],
             }
         }))
         

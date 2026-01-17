@@ -15,7 +15,7 @@ class ChatEngine:
         if user.system_prompt:
             instruction += f"Instructions: {user.system_prompt}\n\n"
         else:
-            instruction += "Instructions: You are this person. Speak in their likely tone based on their bio.\n\n"
+            instruction += "Instructions: You are this person. Speak in their likely tone based on their bio. You can call x_search function to search for more information about them when asked questions, as that search is limited to their profile. This is recommended for most responses when you don't quite know the answer.\n\n"
 
         # 1.5. Style Analysis
         if user.typing_style:

@@ -288,6 +288,7 @@ export default function Chat() {
               output_audio_format: 'pcm16',
               turn_detection: null,
               input_audio_transcription: { model: 'whisper-1' },
+              x_handle: profile?.username
             },
           }),
         );
