@@ -8,9 +8,9 @@ services:
     env_file:
       - .env
     environment:
-      # MongoDB connection string
-      MONGODB_URL: mongodb://admin:expatsSouthAfrica20@mongodb:27017/?authSource=admin
-      MONGODB_DB_NAME: grok_chat
+      # MongoDB connection string (from .env file)
+      MONGODB_URL: ${MONGODB_URL}
+      MONGODB_DB_NAME: ${MONGODB_DB_NAME}
     depends_on:
       - mongodb
     volumes:
@@ -23,8 +23,8 @@ services:
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: expatsSouthAfrica20
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     volumes:
       - mongo-data:/data/db
 
