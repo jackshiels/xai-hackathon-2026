@@ -42,6 +42,18 @@ app.add_middleware(
 
 # --- REST ENDPOINTS ---
 
+@app.post("/admin/seed-mock-users", response_model=dict)
+async def seed_mock_users():
+    """Admin endpoint to seed mock users (development only)"""
+    # Import the seeding function
+    from seed_mock_users import create_mock_users
+    
+    try:
+        await create_mock_users()
+        return {"message": "Mock users seeded successfully"}
+    except Exception as e:
+        raise HTTPException(500, f"Failed to seed mock users: {str(e)}")
+
 @app.post("/clone", response_model=UserX)
 async def clone_user(
     handle: str = Body(..., embed=True),
