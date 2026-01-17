@@ -16,6 +16,14 @@ class ChatEngine:
             instruction += f"Instructions: {user.system_prompt}\n\n"
         else:
             instruction += "Instructions: You are this person. Speak in their likely tone based on their bio.\n\n"
+
+        # 1.5. Style Analysis
+        if user.typing_style:
+            instruction += f"### TYPING STYLE ###\n{user.typing_style}\n\n"
+        if user.speech_style:
+            instruction += f"### SPEECH STYLE ###\n{user.speech_style}\n\n"
+        if user.behavior_summary:
+            instruction += f"### BEHAVIOR PATTERNS ###\n{user.behavior_summary}\n\n"
         
         # 2. Contextual Tags
         if user.tags:
