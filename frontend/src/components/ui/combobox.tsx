@@ -55,7 +55,7 @@ export function Combobox({ onSelect }: ComboboxProps) {
           className="w-[300px] justify-between"
         >
           {value
-            ? users.find((user) => user.username === value)?.display_name || value
+            ? users.find((user) => user.username === value)?.username || value
             : "Search X.com username..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -76,7 +76,7 @@ export function Combobox({ onSelect }: ComboboxProps) {
                   value={user.username}
                   onSelect={(currentValue) => {
                     setValue(currentValue === value ? "" : currentValue)
-                    setInputValue(currentValue === value ? "" : user.display_name)
+                    setInputValue(currentValue === value ? "" : user.username)
                     setOpen(false)
                     if (onSelect && currentValue !== value) {
                       onSelect(currentValue);
