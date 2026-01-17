@@ -3,7 +3,7 @@ import asyncio
 import os
 import logging
 import httpx
-from fastapi import FastAPI, WebSocket, HTTPException, Body
+from fastapi import FastAPI, WebSocket, HTTPException, Body, Query
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Optional
 from dotenv import load_dotenv
@@ -63,7 +63,7 @@ async def clone_user(
     return profile
 
 @app.get("/api/profiles", response_model=List[UserX])
-async def list_profiles(tag: Optional[str] = None):
+async def list_profiles(tag: Optional[str] = Query(None)):
     """Get discovery list, optionally filtered by tag."""
     if tag:
         return await profile_mgr.search_by_tag(tag)
@@ -75,7 +75,7 @@ async def list_tags():
     return await profile_mgr.get_all_tags()
 
 @app.get("/api/profile/exists")
-async def profile_exists(handle: str):
+async def profile_exists(handle: str = Query(...)):
     """Check if a profile exists for the given X handle."""
     existing = await profile_mgr.get_profile_by_username(handle)
     return {"exists": existing is not None}
