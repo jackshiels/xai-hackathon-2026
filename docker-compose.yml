@@ -1,0 +1,32 @@
+services:
+  grok-auth-server:
+    build:
+      context: ./chat-backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      # MongoDB connection string (from .env file)
+      MONGODB_URL: ${MONGODB_URL}
+      MONGODB_DB_NAME: ${MONGODB_DB_NAME}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./chat-backend:/app
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb-crud
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
