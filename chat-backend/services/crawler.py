@@ -48,6 +48,11 @@ class CrawlerService:
             system_prompt=analysis.get('system_prompt', f"You are @{handle}"),
             tags=analysis.get('tags', []),
 
+            # Style analysis
+            typing_style=analysis.get('typing_style'),
+            speech_style=analysis.get('speech_style'),
+            behavior_summary=analysis.get('behavior_summary'),
+
             verified=user_data["verified"],
             verified_type="blue_verified" if user_data["verified"] else None,
             profile_image_url=user_data["profile_image_url"]
@@ -108,7 +113,7 @@ class CrawlerService:
             # Fetch recent tweets
             tweets_response = self.client.get_users_tweets(
                 user.id,
-                max_results=20,
+                max_results=50,
                 tweet_fields=["created_at", "public_metrics", "entities"]
             )
 

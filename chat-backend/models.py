@@ -71,6 +71,11 @@ class UserX(BaseModel):
     # We need to store the "Soul" of the clone (the LLM instructions)
     system_prompt: Optional[str] = Field(default=None, description="The LLM-generated persona instructions")
 
+    # Style analysis
+    typing_style: Optional[str] = Field(default=None, description="Analysis of user's typing style (punctuation, sentence structure, etc.)")
+    speech_style: Optional[str] = Field(default=None, description="Analysis of user's speech style (tone, vocabulary, pacing)")
+    behavior_summary: Optional[str] = Field(default=None, description="Summary of user's behavioral patterns and interaction style")
+
     # Metadata
     fetched_at: datetime = Field(default_factory=datetime.utcnow)
     last_updated: Optional[datetime] = None
