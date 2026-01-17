@@ -8,7 +8,7 @@ from database import db
 from services.llm_service import GrokService # Import the new service
 
 class CrawlerService:
-    def __init__(self, grok_service: GrokService):
+    def __init__(self, grok_service: GrokService | None):
         self.grok = grok_service  # Inject the service
         self.bearer_token = os.getenv("X_BEARER_TOKEN")
         self.client = tweepy.Client(bearer_token=self.bearer_token) if self.bearer_token else None
@@ -71,6 +71,16 @@ class CrawlerService:
         """
         Delegates the analysis to the GrokService.
         """
+        if not self.grok:
+            print("⚠️ Grok service not available, using fallback analysis")
+            return {
+                "bio_snippet": f"Digital clone of @{handle} (Analysis unavailable).",
+                "system_prompt": f"You are @{handle}. Please speak in a generic but helpful tone.",
+                "tags": ["General"],
+                "typing_style": "Generic typing style with standard punctuation.",
+                "speech_style": "Neutral and conversational tone.",
+                "behavior_summary": "Helpful and straightforward interaction style."
+            }
         print(f"🧠 Asking Grok to analyze {len(tweets)} tweets for @{handle}...")
         return await self.grok.generate_persona_analysis(handle, tweets)
 

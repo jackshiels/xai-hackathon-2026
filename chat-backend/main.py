@@ -13,6 +13,7 @@ logger = logging.getLogger("GrokRelay")
 from services.crawler import CrawlerService
 from services.profile_manager import ProfileManager
 from services.chat_engine import ChatEngine
+from services.llm_service import GrokService
 from models import UserX, ConversationalGoal
 from database import db
 
@@ -20,8 +21,9 @@ app = FastAPI()
 XAI_API_KEY = os.getenv("XAI_API_KEY")
 if not XAI_API_KEY:
     print("⚠️ WARNING: XAI_API_KEY not found. Crawler will fail.")
-
-grok_service = GrokService(api_key=XAI_API_KEY)
+    grok_service = None
+else:
+    grok_service = GrokService(api_key=XAI_API_KEY)
 
 # 2. Pass LLM Service to Crawler
 crawler = CrawlerService(grok_service=grok_service)
@@ -47,6 +49,13 @@ async def clone_user(
     from models import VALID_VOICE_IDS
     if voice not in VALID_VOICE_IDS:
         raise HTTPException(400, f"Invalid voice ID. Must be one of: {VALID_VOICE_IDS}")
+
+    # Check if profile already exists
+    existing_profile = await profile_mgr.get_profile_by_username(handle)
+    if existing_profile:
+        return existing_profile
+
+    # Clone new profile
     profile = await crawler.clone_profile(handle, voice, goals)
     return profile
 
@@ -61,6 +70,12 @@ async def list_profiles(tag: Optional[str] = None):
 async def list_tags():
     """Get all unique tags from the database."""
     return await profile_mgr.get_all_tags()
+
+@app.get("/api/profile/exists")
+async def profile_exists(handle: str):
+    """Check if a profile exists for the given X handle."""
+    existing = await profile_mgr.get_profile_by_username(handle)
+    return {"exists": existing is not None}
 
 @app.post("/api/session/init")
 async def init_session(profile_id: str = Body(...), goals: List[str] = Body(default=[])):
