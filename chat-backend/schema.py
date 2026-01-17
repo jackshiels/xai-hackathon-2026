@@ -64,6 +64,9 @@ class UserX(BaseModel):
     # Voice preference
     voice_id: Optional[str] = Field(default="Ara", description="Preferred voice ID for this user")
 
+    # Tags
+    tags: List[str] = Field(default_factory=list, description="User tags for categorization and filtering")
+
     # Metadata you might want to add yourself
     fetched_at: datetime = Field(default_factory=datetime.utcnow)
     last_updated: Optional[datetime] = None
@@ -149,6 +152,7 @@ example_user = {
     "description": "X Æ A-12's dad",
     "location": "𝕏",
     "voice_id": "Rex",  # Authoritative voice for business/professional use
+    "tags": ["tech", "entrepreneur", "verified", "high-follower"],  # User tags
     "public_metrics": {
         "followers_count": 200000000,
         "following_count": 500,
@@ -164,8 +168,9 @@ example_user = {
 if __name__ == "__main__":
     # Test user model
     user_model = UserX(**example_user, fetched_at=datetime.utcnow())
-    print("User Model with Voice:")
+    print("User Model with Voice and Tags:")
     print(f"Voice ID: {user_model.voice_id}")
+    print(f"Tags: {user_model.tags}")
     print(user_model.model_dump_json(indent=2))
 
     # Test voice validation
@@ -178,9 +183,11 @@ if __name__ == "__main__":
             name="Test User",
             created_at=datetime.utcnow(),
             voice_id="Eve",  # Valid voice
+            tags=["developer", "python"],  # Tags example
             public_metrics=PublicMetrics(followers_count=0, following_count=0, tweet_count=0, listed_count=0)
         )
         print(f"✅ Valid voice 'Eve': {test_user_valid.voice_id}")
+        print(f"✅ Tags: {test_user_valid.tags}")
 
         # Test invalid voice
         try:
