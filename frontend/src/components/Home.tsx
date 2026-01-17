@@ -182,7 +182,7 @@ function Home() {
           <div className="rounded-[20px] bg-grok-panel/80 p-5 shadow-[0_30px_90px_-60px_rgba(0,0,0,0.8)] backdrop-blur-2xl ring-1 ring-white/5">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-gray-400">Existing Profiles</p>
+                <p className="text-[11px] text-left font-mono uppercase tracking-[0.2em] text-gray-400">Existing Profiles</p>
                 <h2 className="text-lg font-semibold text-white">Pick a persona to start chatting</h2>
               </div>
               {loadingProfiles ? <span className="text-xs text-gray-400">Loading...</span> : null}
