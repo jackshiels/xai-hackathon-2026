@@ -18,6 +18,26 @@ type WSMessage = {
   error?: { message?: string };
 };
 
+type PublicMetrics = {
+  followers_count: number;
+  following_count: number;
+  tweet_count: number;
+  listed_count?: number;
+};
+
+type UserProfile = {
+  _id?: string;
+  id?: string;
+  username: string;
+  name: string;
+  description?: string;
+  profile_image_url?: string;
+  profile_banner_url?: string;
+  public_metrics?: PublicMetrics;
+  tags?: string[];
+  voice_id?: string;
+};
+
 class AudioStreamPlayer {
   private queue: AudioBuffer[] = [];
   private nextStartTime = 0;
@@ -118,6 +138,7 @@ export default function Chat() {
 
   const [backendUrl, setBackendUrl] = useState('http://localhost:8000');
   const [voice, setVoice] = useState(initialVoice);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [systemInstructions, setSystemInstructions] = useState<string | null>(null);
   const [isBootstrapping, setIsBootstrapping] = useState(false);
   const [status, setStatus] = useState<Status>('disconnected');
@@ -342,6 +363,7 @@ export default function Chat() {
           throw new Error('Failed to fetch profile');
         }
         const profileData = await profileRes.json();
+        setProfile(profileData);
         if (profileData?.voice_id) setVoice(profileData.voice_id);
 
         const goals =
@@ -412,6 +434,45 @@ export default function Chat() {
             </div>
 
             <div className="relative flex flex-col gap-5">
+              {profile ? (
+                <div className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 shadow-inner">
+                  <div className="flex items-center gap-4">
+                    <div className="h-14 w-14 overflow-hidden rounded-full border border-white/10 bg-black/40">
+                      {profile.profile_image_url ? (
+                        <img src={profile.profile_image_url} alt={profile.username} className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-lg font-semibold text-white">
+                          {profile.username?.[0]?.toUpperCase() ?? '?'}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-lg font-semibold text-white">{profile.name}</span>
+                      <span className="text-sm text-gray-400">@{profile.username}</span>
+                    </div>
+                    <div className="ml-auto text-xs uppercase tracking-[0.15em] text-gray-300">
+                      {profile.public_metrics?.followers_count
+                        ? `${profile.public_metrics.followers_count.toLocaleString()} followers`
+                        : 'Followers N/A'}
+                    </div>
+                  </div>
+                  {profile.description ? (
+                    <p className="text-sm text-gray-200">{profile.description}</p>
+                  ) : (
+                    <p className="text-sm text-gray-400">No bio available.</p>
+                  )}
+                  {profile.tags && profile.tags.length ? (
+                    <div className="flex flex-wrap gap-2">
+                      {profile.tags.slice(0, 5).map((tag) => (
+                        <span key={tag} className="rounded-full border border-white/10 bg-white/10 px-2 py-[2px] text-[11px] text-gray-200">
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+
               <StatusBar status={status} text={statusText} micText={micText} />
 
               <Transcript messages={messages} />
