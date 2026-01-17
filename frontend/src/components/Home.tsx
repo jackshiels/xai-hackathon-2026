@@ -1,11 +1,32 @@
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { Combobox } from './ui/combobox';
+
+const BACKEND_URL = 'http://localhost:8000';
 
 function Home() {
   const navigate = useNavigate();
+  const [checking, setChecking] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleUserSelect = (username: string) => {
-    navigate(`/clone/${username}`);
+  const handleUserSelect = async (username: string) => {
+    setError(null);
+    setChecking(true);
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/profile/exists?handle=${encodeURIComponent(username)}`);
+      if (!res.ok) throw new Error('Failed to verify profile');
+      const data = await res.json();
+      if (data?.exists) {
+        navigate(`/chat/${username}`);
+      } else {
+        navigate(`/clone/${username}`);
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unable to verify profile';
+      setError(message);
+    } finally {
+      setChecking(false);
+    }
   };
 
   return (
@@ -42,6 +63,12 @@ function Home() {
               <div className="rounded-2xl border border-white/10 bg-white/5 p-2 shadow-inner backdrop-blur">
                 <Combobox onSelect={handleUserSelect} />
               </div>
+              {checking ? (
+                <p className="text-xs text-gray-400">Checking profile...</p>
+              ) : null}
+              {error ? (
+                <p className="text-xs text-red-300">{error}</p>
+              ) : null}
             </div>
           </div>
         </div>
