@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import List
 import tweepy
 from models import UserX, PublicMetrics, Entities, ConversationalGoal
+from fastapi.encoders import jsonable_encoder
 from database import db
 from services.llm_service import GrokService # Import the new service
 
@@ -59,11 +60,9 @@ class CrawlerService:
         )
         
         # Upsert into DB
-        await db.profiles.update_one(
-            {"_id": user_profile.id}, 
-            {"$set": user_profile.model_dump(by_alias=True)}, 
-            upsert=True
-        )
+        # Encode to plain types to avoid ObjectId/HttpUrl issues with Mongo
+        encoded_profile = jsonable_encoder(user_profile, by_alias=True)
+        await db.profiles.update_one({"_id": user_profile.id}, {"$set": encoded_profile}, upsert=True)
         
         return user_profile
 
