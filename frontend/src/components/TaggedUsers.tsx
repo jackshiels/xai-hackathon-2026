@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Users, ArrowLeft, MessageSquare, Heart, Repeat } from 'lucide-react';
+import { Users, ArrowLeft, MessageSquare, Heart } from 'lucide-react';
 
 const BACKEND_URL = 'http://localhost:8000';
 
@@ -158,7 +158,13 @@ export default function TagBrowse() {
                       {/* Online/Verified Badge could go here */}
                     </div>
                     
-                    <button className="flex h-8 w-8 items-center justify-center rounded-full bg-white/5 text-blue-400 opacity-0 transition-all hover:bg-blue-500 hover:text-white group-hover:opacity-100">
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCardClick(user.username);
+                      }}
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-white/5 text-blue-400 opacity-0 transition-all hover:bg-blue-500 hover:text-white group-hover:opacity-100"
+                    >
                       <MessageSquare className="h-4 w-4" />
                     </button>
                   </div>
