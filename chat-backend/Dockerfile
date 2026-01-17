@@ -16,5 +16,5 @@ COPY .  .
 # Expose the API port
 EXPOSE 8000
 
-# Run the FastAPI server
-CMD ["python", "server.py"]
+# Run the FastAPI server (full app with clone/profile routes)
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -6,6 +6,9 @@ import httpx
 from fastapi import FastAPI, WebSocket, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Optional
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("GrokRelay")
@@ -39,7 +42,7 @@ app.add_middleware(
 
 # --- REST ENDPOINTS ---
 
-@app.post("/api/clone", response_model=UserX)
+@app.post("/clone", response_model=UserX)
 async def clone_user(
     handle: str = Body(..., embed=True),
     voice: str = Body("Ara", embed=True),

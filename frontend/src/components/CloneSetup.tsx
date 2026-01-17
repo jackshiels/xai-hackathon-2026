@@ -31,7 +31,7 @@ export default function CloneSetup() {
     setSuccess(null);
 
     try {
-      const response = await fetch(`${BACKEND_URL}/api/clone`, {
+      const response = await fetch(`${BACKEND_URL}/clone`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

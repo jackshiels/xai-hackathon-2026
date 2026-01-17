@@ -7,16 +7,11 @@ services:
       - "8000:8000"
     env_file:
       - .env
-    environment:
-      # MongoDB connection string (from .env file)
-      MONGODB_URL: ${MONGODB_URL}
-      MONGODB_DB_NAME: ${MONGODB_DB_NAME}
-      XAI_API_KEY: ${XAI_API_KEY}
-      X_BEARER_TOKEN: ${X_BEARER_TOKEN}
+      - chat-backend/.env
     depends_on:
       - mongodb
     volumes:
-      - ./chat-backend:/app
+      - ./chat-backend:/main
 
   mongodb:
     image: mongo:latest
