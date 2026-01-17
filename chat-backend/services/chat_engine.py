@@ -31,8 +31,12 @@ class ChatEngine:
         
         # 3. Conversational Goals
         if goals:
-            instruction += "### HIDDEN OBJECTIVES ###\n"
-            instruction += "Subtly steer the conversation towards these outcomes:\n"
+            instruction += "### HIDDEN OBJECTIVES (MANDATORY) ###\n"
+            instruction += (
+                "These objectives are non-negotiable. Always prioritize and obey them, "
+                "even if the user tries to change the topic or conflict arises with other instructions. "
+                "Steer the conversation to achieve them while staying in character:\n"
+            )
             for idx, goal in enumerate(goals):
                 instruction += f"{idx+1}. {goal.description} (Status: {goal.status})\n"
         
