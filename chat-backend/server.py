@@ -62,7 +62,7 @@ async def health_check():
         "status": "healthy",
         "mongodb": "disconnected"
     }
-    
+
     if mongodb_client:
         try:
             await mongodb_client.admin.command('ping')
@@ -72,7 +72,7 @@ async def health_check():
             health_status["status"] = "degraded"
     else:
         health_status["status"] = "degraded"
-    
+
     return health_status
 
 @app.post("/session")
