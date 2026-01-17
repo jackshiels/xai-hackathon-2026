@@ -1,9 +1,7 @@
-export type ChatStatus = 'disconnected' | 'connecting' | 'listening' | 'speaking' | 'responding';
+export type Status = 'disconnected' | 'connecting' | 'listening' | 'speaking' | 'responding';
 
-export interface Message {
-  id: number;
-  text: string;
-  sender: 'user' | 'bot';
-  timestamp: Date;
-  streaming?: boolean;
-}
+export type Message = {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+};
