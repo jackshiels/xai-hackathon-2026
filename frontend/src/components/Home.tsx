@@ -138,7 +138,7 @@ function Home() {
           Clone your Profile in Seconds and Create a Second{' '}
           <span className="you-glow">You</span>
         </p>
-        
+
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2 max-w-3xl">
           {['workout', 'growth', 'tech', 'x-enthusiast', 'finance', 'ai', 'startup', 'crypto'].map((tag, idx) => (
             <button
@@ -157,7 +157,7 @@ function Home() {
         </div>
 
         <div className="relative mt-8 w-full max-w-xl">
-          <div className="relative overflow-hidden rounded-[20px] border border-grok-border/60 bg-grok-panel/80 p-5 shadow-[0_30px_90px_-60px_rgba(0,0,0,0.8)] backdrop-blur-2xl ring-1 ring-white/5">
+          <div className="relative overflow-hidden rounded-[20px] border-grok-border/60 bg-grok-panel/80 p-5 shadow-[0_30px_90px_-60px_rgba(0,0,0,0.8)] backdrop-blur-2xl ring-1 ring-white/5">
             <div className="pointer-events-none absolute inset-0 opacity-60">
               <div className="absolute -right-10 -top-16 h-48 w-48 rounded-full bg-white/5 blur-3xl" />
               <div className="absolute left-10 bottom-0 h-40 w-40 rounded-full bg-blue-500/10 blur-3xl" />

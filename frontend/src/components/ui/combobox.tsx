@@ -49,10 +49,10 @@ export function Combobox({ onSelect }: ComboboxProps) {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          variant="outline"
+          // variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[300px] justify-between"
+          className="w-[500px] justify-between"
         >
           {value
             ? users.find((user) => user.username === value)?.username || value
