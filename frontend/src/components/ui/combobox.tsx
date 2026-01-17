@@ -60,8 +60,11 @@ export function Combobox({ onSelect }: ComboboxProps) {
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0">
-        <Command className="rounded-2xl border border-white/10 bg-white/5 text-white shadow-inner backdrop-blur">
+      <PopoverContent
+        align="start"
+        className="w-[var(--radix-popper-anchor-width)] border-0 bg-transparent p-0 shadow-none"
+      >
+        <Command className="rounded-2xl bg-white/5 text-white shadow-inner backdrop-blur">
           <CommandInput
             placeholder="Type to search..."
             className="border-0 text-white placeholder:text-gray-400"
@@ -69,7 +72,7 @@ export function Combobox({ onSelect }: ComboboxProps) {
             onValueChange={setInputValue}
           />
           <CommandList className="max-h-[200px]">
-            <CommandEmpty className="text-gra40y-0 py-3">No users found.</CommandEmpty>
+            <CommandEmpty className="text-gra40y-0 py-3 px-4">No users found.</CommandEmpty>
             <CommandGroup className="p-2">
               {users.map((user) => (
                 <CommandItem

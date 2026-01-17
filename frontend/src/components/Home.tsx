@@ -123,7 +123,7 @@ function Home() {
         </div>
       </div>
 
-      <main className="relative z-20 mx-auto flex min-h-[70vh] w-full max-w-5xl flex-col items-center justify-center px-4 pb-14 text-center">
+      <main className="relative z-20 mx-auto flex min-h-[70vh] w-full max-w-5xl flex-col items-center justify-center px-4 py-12 pb-14 text-center">
         <div className="relative w-full select-none text-center">
           <h1 className="font-sans font-extrabold text-[18vw] leading-none tracking-tight grok-text-gradient opacity-90 mix-blend-overlay md:text-[200px]">
             PersonifX
@@ -137,8 +137,11 @@ function Home() {
           Clone your Profile in Seconds and Create a Second{' '}
           <span className="you-glow">You</span>
         </p>
+        <p className="mt-6 text-xs font-mono uppercase tracking-[0.2em] text-gray-400">
+          What do you want to talk about?
+        </p>
 
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-2 max-w-3xl">
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-2 max-w-3xl">
           {['workout', 'growth', 'tech', 'x-enthusiast', 'finance', 'ai', 'startup', 'crypto'].map((tag, idx) => (
             <button
               key={tag}
