@@ -115,7 +115,6 @@ function Home() {
                 animationDuration: `${p.duration}s, ${p.duration * 0.7}s`,
                 // @ts-expect-error CSS custom props
                 '--dx': `${p.driftX}px`,
-                // @ts-expect-error CSS custom props
                 '--dy': `${p.driftY}px`,
                 filter: `drop-shadow(0 0 ${p.glow}px rgba(140, 200, 255, 0.7))`,
               }}
@@ -182,7 +181,7 @@ function Home() {
         <div className="relative mt-8 w-full max-w-xl"></div>
 
         <div className="relative mt-12 w-full max-w-5xl">
-          <div className="rounded-[20px] border border-grok-border/60 bg-grok-panel/80 p-5 shadow-[0_30px_90px_-60px_rgba(0,0,0,0.8)] backdrop-blur-2xl">
+          <div className="rounded-[20px] bg-grok-panel/80 p-5 shadow-[0_30px_90px_-60px_rgba(0,0,0,0.8)] backdrop-blur-2xl ring-1 ring-white/5">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-gray-400">Existing Profiles</p>
