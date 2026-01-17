@@ -1,14 +1,20 @@
 import os
+import asyncio
+import logging
+import json
 import httpx
-from fastapi import FastAPI, HTTPException
+import websockets
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
 load_dotenv()
 
-app = FastAPI(title="Grok Voice Agent Auth Server")
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("GrokRelay")
 
-# Allow CORS for local development
+app = FastAPI()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -16,20 +22,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-SESSION_REQUEST_URL = "https://api.x.ai/v1/realtime/client_secrets"
 XAI_API_KEY = os.getenv("XAI_API_KEY")
-
-if not XAI_API_KEY:
-    print("WARNING: XAI_API_KEY is not set in environment variables.")
+SESSION_REQUEST_URL = "https://api.x.ai/v1/realtime/client_secrets"
+# Ensure this matches the docs exactly
+XAI_URL = "wss://api.x.ai/v1/realtime"
 
 @app.post("/session")
 async def get_ephemeral_token():
-    """
-    Fetches a short-lived ephemeral token from xAI.
-    Clients use this token to connect to the WebSocket securely.
-    """
     if not XAI_API_KEY:
+        logger.error("❌ XAI_API_KEY is missing in environment variables!")
         raise HTTPException(status_code=500, detail="Server misconfigured: API Key missing")
+
+    logger.info("Requesting ephemeral token from xAI...")
 
     async with httpx.AsyncClient() as client:
         try:
@@ -39,14 +43,70 @@ async def get_ephemeral_token():
                     "Authorization": f"Bearer {XAI_API_KEY}",
                     "Content-Type": "application/json",
                 },
-                json={"expires_after": {"seconds": 300}}, # Token valid for 5 mins
+                json={"expires_after": {"seconds": 300}},
             )
-            response.raise_for_status()
-            return response.json()
-        except httpx.HTTPStatusError as e:
-            raise HTTPException(status_code=e.response.status_code, detail=str(e))
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            
+            # 2. LOG THE RESPONSE if it fails
+            if response.status_code != 200:
+                logger.error(f"❌ xAI API Error: {response.status_code} - {response.text}")
+                raise HTTPException(status_code=response.status_code, detail=f"xAI Error: {response.text}")
+
+            data = response.json()
+            logger.info("✅ Token received successfully")
+            return data
+
+        except httpx.RequestError as e:
+            logger.error(f"❌ Network Error: {e}")
+            raise HTTPException(status_code=500, detail="Failed to connect to xAI")
+
+@app.websocket("/ws")
+async def websocket_endpoint(client_ws: WebSocket):
+    await client_ws.accept()
+    logger.info("🟢 Browser connected")
+
+    if not XAI_API_KEY:
+        await client_ws.close(code=1008)
+        return
+
+    try:
+        async with websockets.connect(
+            uri=XAI_URL,
+            ssl=True,
+            additional_headers={"Authorization": f"Bearer {XAI_API_KEY}"}
+        ) as xai_ws:
+            
+            logger.info("✅ Connected to xAI")
+            await client_ws.send_text(json.dumps({"type": "server_log", "message": "Connected to xAI"}))
+
+            async def browser_to_xai():
+                try:
+                    while True:
+                        data = await client_ws.receive_text()
+                        logger.info(f"⬆️ Sending to xAI: {data[:100]}...") # Log what we send
+                        await xai_ws.send(data)
+                except Exception:
+                    pass
+
+            async def xai_to_browser():
+                try:
+                    async for message in xai_ws:
+                        if isinstance(message, str):
+                            msg_data = json.loads(message)
+                            if msg_data.get('type') != 'response.audio.delta':
+                                logger.info(f"⬇️ Received from xAI: {json.dumps(msg_data, indent=2)}")
+
+                            await client_ws.send_text(message)
+                        else:
+                            # Binary data, e.g., audio
+                            await client_ws.send_bytes(message)
+                except Exception as e:
+                    logger.error(f"Error xAI->Browser: {e}")
+
+            await asyncio.gather(browser_to_xai(), xai_to_browser())
+
+    except Exception as e:
+        logger.error(f"❌ Connection Error: {e}")
+        await client_ws.close()
 
 if __name__ == "__main__":
     import uvicorn
