@@ -4,7 +4,7 @@ from typing import List, Dict, Any
 from openai import AsyncOpenAI
 
 class GrokService:
-    def __init__(self, api_key: str, model: str = "grok-2-1212"):
+    def __init__(self, api_key: str, model: str = "grok-4-1-fast-non-reasoning-latest"):
         """
         Initialize the Grok service wrapper.
         
@@ -83,7 +83,6 @@ class GrokService:
             return self._extract_json(raw_content)
 
         except Exception as e:
-            print(f"❌ Grok Analysis Failed: {e}")
             # Fallback data so the app doesn't crash
             return {
                 "bio_snippet": f"Digital clone of @{handle} (Analysis failed).",
