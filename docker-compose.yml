@@ -11,6 +11,8 @@ services:
       # MongoDB connection string (from .env file)
       MONGODB_URL: ${MONGODB_URL}
       MONGODB_DB_NAME: ${MONGODB_DB_NAME}
+      XAI_API_KEY: ${XAI_API_KEY}
+      X_BEARER_TOKEN: ${X_BEARER_TOKEN}
     depends_on:
       - mongodb
     volumes:
