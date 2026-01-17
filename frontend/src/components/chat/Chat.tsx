@@ -311,24 +311,6 @@ export default function Chat() {
         <div className="space-y-4">
           <StatusBar status={status} text={statusText} micText={micText} />
 
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <input
-              type="text"
-              value={backendUrl}
-              onChange={(e) => setBackendUrl(e.target.value)}
-              placeholder="Backend URL"
-              className="w-full rounded-xl border border-white/70 bg-white/70 px-3 py-2 text-sm text-ink shadow-sm outline-none ring-0 transition focus:border-accent focus:bg-white"
-            />
-            <select
-              value={voice}
-              onChange={(e) => setVoice(e.target.value)}
-              className="rounded-xl border border-white/70 bg-white/70 px-3 py-2 text-sm text-ink shadow-sm outline-none ring-0 transition focus:border-accent focus:bg-white"
-            >
-              <option value="Ara">Ara (Female)</option>
-              <option value="Rex">Rex (Male)</option>
-            </select>
-          </div>
-
           <Transcript messages={messages} />
 
           {error ? (
