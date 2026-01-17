@@ -16,8 +16,10 @@ function Home() {
       const res = await fetch(`${BACKEND_URL}/api/profile/exists?handle=${encodeURIComponent(username)}`);
       if (!res.ok) throw new Error('Failed to verify profile');
       const data = await res.json();
-      if (data?.exists) {
-        navigate(`/chat/${username}`);
+      if (data?.exists && data?.profile_id) {
+        navigate(`/chat/${data.profile_id}`);
+      } else if (data?.exists) {
+        throw new Error('Profile found but missing profile_id');
       } else {
         navigate(`/clone/${username}`);
       }
