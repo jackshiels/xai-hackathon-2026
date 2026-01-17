@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import List, Dict, Optional, Any
-from pydantic import BaseModel, Field, HttpUrl, validator  # optional but very nice
+from pydantic import BaseModel, Field, HttpUrl, field_validator  # optional but very nice
 from enum import Enum
 
 
@@ -68,7 +68,8 @@ class UserX(BaseModel):
     fetched_at: datetime = Field(default_factory=datetime.utcnow)
     last_updated: Optional[datetime] = None
 
-    @validator('voice_id')
+    @field_validator('voice_id')
+    @classmethod
     def validate_voice_id(cls, v):
         if v is None:
             return v
