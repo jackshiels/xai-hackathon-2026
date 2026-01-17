@@ -493,21 +493,26 @@ export default function Chat() {
 
               <div className="flex flex-wrap items-center gap-3">
                 <button
-                  onClick={connect}
+                  onClick={() => {
+                    if (status !== 'disconnected' && status !== 'connecting') {
+                      disconnect();
+                    } else {
+                      connect();
+                    }
+                  }}
                   disabled={isConnecting || isBootstrapping || !systemInstructions}
                   className="group relative overflow-hidden rounded-full border border-white/30 bg-white px-5 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-black shadow-xl transition-all duration-300 hover:-translate-y-[1px] hover:shadow-white/40 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <span className="relative z-10">
-                    {isConnecting ? 'Connecting...' : isBootstrapping ? 'Preparing...' : 'Start Conversation'}
+                    {isConnecting
+                      ? 'Connecting...'
+                      : isBootstrapping
+                        ? 'Preparing...'
+                        : status !== 'disconnected'
+                          ? 'Disconnect'
+                          : 'Start Conversation'}
                   </span>
                   <span className="absolute inset-0 bg-gradient-to-r from-white via-white to-gray-200 opacity-0 transition group-hover:opacity-20" />
-                </button>
-                <button
-                  onClick={disconnect}
-                  disabled={!isConnected}
-                  className="rounded-full border border-white/20 px-5 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-gray-200 transition duration-300 hover:-translate-y-[1px] hover:border-white/40 hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  Disconnect
                 </button>
               </div>
 
