@@ -55,8 +55,8 @@ export default function TagBrowse() {
     fetchUsersByTag();
   }, [tag]);
 
-  const handleCardClick = (username: string) => {
-    navigate(`/chat/${username}`);
+  const handleCardClick = (user_id: string) => {
+    navigate(`/chat/${user_id}`);
   };
 
   const formatNumber = (num: number) => {
@@ -125,7 +125,7 @@ export default function TagBrowse() {
             {users.map((user) => (
               <div
                 key={user._id}
-                onClick={() => handleCardClick(user.username)}
+                onClick={() => handleCardClick(user._id)}
                 className="group relative cursor-pointer overflow-hidden rounded-[20px] border border-grok-border/60 bg-grok-panel/60 p-5 shadow-lg backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-blue-500/30 hover:shadow-blue-500/10"
               >
                 {/* Banner Gradient fallback or Image */}
