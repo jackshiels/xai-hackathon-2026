@@ -44,6 +44,23 @@ function Home() {
       })),
     [],
   );
+  const floatingAvatars = useMemo(
+    () =>
+      profiles
+        .filter((p) => p.profile_image_url)
+        .map((p, idx) => ({
+          id: p._id || p.id || p.username || `profile-${idx}`,
+          src: p.profile_image_url as string,
+          top: Math.random() * 90,
+          left: Math.random() * 90,
+          size: 80 + Math.random() * 90,
+          blur: 3 + Math.random() * 4,
+          opacity: 0.25 + Math.random() * 0.15,
+          duration: 16 + Math.random() * 12,
+          delay: Math.random() * 8,
+        })),
+    [profiles],
+  );
 
   const handleUserSelect = async (username: string) => {
     setError(null);
@@ -98,6 +115,26 @@ function Home() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-grok-bg text-white">
       <div className="pointer-events-none absolute inset-0">
+        <div className="absolute inset-0 overflow-hidden">
+          {floatingAvatars.map((a) => (
+            <img
+              key={a.id}
+              src={a.src}
+              alt=""
+              className="absolute rounded-full object-cover"
+              style={{
+                left: `${a.left}%`,
+                top: `${a.top}%`,
+                width: `${a.size}px`,
+                height: `${a.size}px`,
+                filter: `blur(${a.blur}px)`,
+                opacity: a.opacity,
+                animation: `float ${a.duration}s ease-in-out infinite`,
+                animationDelay: `${a.delay}s`,
+              }}
+            />
+          ))}
+        </div>
         <div className="absolute -left-1/4 -top-1/3 h-[60vw] w-[60vw] bg-glow-conic opacity-40 blur-3xl" />
         <div className="absolute top-1/2 right-[-12%] -translate-y-1/2 h-[80vw] w-[80vw] nebula-glow rounded-full mix-blend-screen" />
         <div className="absolute top-1/2 right-[-200px] -translate-y-1/2 h-[820px] w-[620px] light-beam" />
