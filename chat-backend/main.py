@@ -1,8 +1,14 @@
 import json
 import asyncio
+import os
+import logging
+import httpx
 from fastapi import FastAPI, WebSocket, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Optional
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("GrokRelay")
 
 from services.crawler import CrawlerService
 from services.profile_manager import ProfileManager
@@ -67,6 +73,38 @@ async def init_session(profile_id: str = Body(...), goals: List[str] = Body(defa
         "voice_preset": user_x.voice_id  # Uses the Voice ID from the schema
     }
 
+@app.post("/session")
+async def get_ephemeral_token():
+    if not XAI_API_KEY:
+        logging.error("❌ XAI_API_KEY is missing in environment variables!")
+        raise HTTPException(status_code=500, detail="Server misconfigured: API Key missing")
+
+    logging.info("Requesting ephemeral token from xAI...")
+
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.post(
+                url=SESSION_REQUEST_URL,
+                headers={
+                    "Authorization": f"Bearer {XAI_API_KEY}",
+                    "Content-Type": "application/json",
+                },
+                json={"expires_after": {"seconds": 300}},
+            )
+
+            # 2. LOG THE RESPONSE if it fails
+            if response.status_code != 200:
+                logging.error(f"❌ xAI API Error: {response.status_code} - {response.text}")
+                raise HTTPException(status_code=response.status_code, detail=f"xAI Error: {response.text}")
+
+            data = response.json()
+            logging.info("✅ Token received successfully")
+            return data
+
+        except httpx.RequestError as e:
+            logging.error(f"❌ Network Error: {e}")
+            raise HTTPException(status_code=500, detail="Failed to connect to xAI")
+
 # --- WEBSOCKET RELAY ---
 # (Stays mostly the same, just imports UserX context indirectly via session/init)
 import websockets
@@ -74,6 +112,7 @@ import os
 
 XAI_URL = "wss://api.x.ai/v1/realtime"
 XAI_API_KEY = os.getenv("XAI_API_KEY")
+SESSION_REQUEST_URL = "https://api.x.ai/v1/realtime/client_secrets"
 
 @app.websocket("/ws")
 async def websocket_endpoint(client_ws: WebSocket):
@@ -105,13 +144,24 @@ async def websocket_endpoint(client_ws: WebSocket):
             try:
                 while True:
                     data = await client_ws.receive_text()
+                    logger.info(f"⬆️ Sending to xAI: {data[:100]}...")
                     await xai_ws.send(data)
-            except Exception: pass
+            except Exception:
+                pass
 
         async def xai_to_browser():
             try:
                 async for message in xai_ws:
-                    await client_ws.send_text(message)
-            except Exception: pass
+                    if isinstance(message, str):
+                        msg_data = json.loads(message)
+                        if msg_data.get('type') != 'response.audio.delta':
+                            logger.info(f"⬇️ Received from xAI: {json.dumps(msg_data, indent=2)}")
+
+                        await client_ws.send_text(message)
+                    else:
+                        # Binary data, e.g., audio
+                        await client_ws.send_bytes(message)
+            except Exception as e:
+                logger.error(f"Error xAI->Browser: {e}")
 
         await asyncio.gather(browser_to_xai(), xai_to_browser())
