@@ -38,8 +38,7 @@ export default function TagBrowse() {
       
       setLoading(true);
       try {
-        // Adjust endpoint based on your FastAPI router definition
-        const res = await fetch(`${BACKEND_URL}/api/users?tag=${encodeURIComponent(tag)}`);
+        const res = await fetch(`${BACKEND_URL}/api/profiles?tag=${encodeURIComponent(tag)}`);
         
         if (!res.ok) throw new Error('Failed to fetch users');
         
