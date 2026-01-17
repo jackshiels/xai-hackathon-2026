@@ -69,13 +69,13 @@ export function Combobox({ onSelect }: ComboboxProps) {
             onValueChange={setInputValue}
           />
           <CommandList className="max-h-[200px]">
-            <CommandEmpty>No users found.</CommandEmpty>
-            <CommandGroup>
+            <CommandEmpty className="text-gray-400 py-4">No users found.</CommandEmpty>
+            <CommandGroup className="p-1">
               {users.map((user) => (
                 <CommandItem
                   key={user.username}
                   value={user.username}
-                  className="hover:bg-white/10 data-[selected=true]:bg-white/20"
+                  className="hover:bg-white/10 data-[selected=true]:bg-white/20 px-3 py-2 rounded-lg text-white"
                   onSelect={(currentValue) => {
                     setValue(currentValue === value ? "" : currentValue)
                     setInputValue(currentValue === value ? "" : user.username)
