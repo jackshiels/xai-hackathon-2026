@@ -1,14 +1,20 @@
-version: "3.8"
-
 services:
   grok-auth-server:
-    build: .
+    build:
+      context: ./chat-backend
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
     env_file:
       - .env
+    environment:
+      # MongoDB connection string
+      MONGODB_URL: mongodb://admin:expatsSouthAfrica20@mongodb:27017/?authSource=admin
+      MONGODB_DB_NAME: grok_chat
+    depends_on:
+      - mongodb
     volumes:
-      - ./src:/app/src
+      - ./chat-backend:/app
 
   mongodb:
     image: mongo:latest
