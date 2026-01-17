@@ -49,10 +49,10 @@ export function Combobox({ onSelect }: ComboboxProps) {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          // variant="outline"
+          variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[500px] justify-between"
+          className="w-full justify-between rounded-xl border border-white/10 bg-white/5 text-white hover:border-white/20 hover:bg-white/10 focus:border-white/20 focus:bg-white/10"
         >
           {value
             ? users.find((user) => user.username === value)?.username || value
@@ -60,20 +60,22 @@ export function Combobox({ onSelect }: ComboboxProps) {
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[300px] p-0">
-        <Command className="rounded-xl border border-white/15 bg-grok-panel/90 text-white shadow-2xl backdrop-blur-xl">
+      <PopoverContent className="w-full p-0">
+        <Command className="rounded-xl border border-white/15 bg-grok-panel/95 text-white shadow-2xl backdrop-blur-xl">
           <CommandInput
             placeholder="Type to search..."
+            className="border-white/10 text-white placeholder:text-gray-400"
             value={inputValue}
             onValueChange={setInputValue}
           />
-          <CommandList>
+          <CommandList className="max-h-[200px]">
             <CommandEmpty>No users found.</CommandEmpty>
             <CommandGroup>
               {users.map((user) => (
                 <CommandItem
                   key={user.username}
                   value={user.username}
+                  className="hover:bg-white/10 data-[selected=true]:bg-white/20"
                   onSelect={(currentValue) => {
                     setValue(currentValue === value ? "" : currentValue)
                     setInputValue(currentValue === value ? "" : user.username)
