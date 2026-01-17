@@ -27,6 +27,11 @@ SESSION_REQUEST_URL = "https://api.x.ai/v1/realtime/client_secrets"
 # Ensure this matches the docs exactly
 XAI_URL = "wss://api.x.ai/v1/realtime"
 
+@app.get("/health")
+async def health_check():
+    """Health check endpoint to verify the server is running."""
+    return {"status": "healthy", "service": "grok-auth-server"}
+
 @app.post("/session")
 async def get_ephemeral_token():
     if not XAI_API_KEY:
